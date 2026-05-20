@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explorador de Sectores Económicos — GÉNESIS XP</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --void:    #04040a;
+  --deep:    #08081a;
+  --mid:     #0d0d28;
+  --snow:    #f0eee8;
+  --dim:     rgba(240,238,232,0.35);
+  --dimmer:  rgba(240,238,232,0.10);
+  --gold:    #c9943a;
+  --gold2:   #e8b85a;
+  --gold3:   #f5d68a;
+  --teal:    #1a8f8f;
+  --teal2:   #22b5b5;
+  --violet:  #6b4faa;
+  --violet2: #9b7fdc;
+  --coral:   #c0452a;
+  --coral2:  #e06040;
+  --green:   #2a7a4a;
+  --green2:  #3ab068;
+  --rose:    #a03060;
+  --rose2:   #d06090;
+  --slate:   #3060a0;
+  --slate2:  #5090d0;
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--void);
+  color: var(--snow);
+  font-family: 'DM Mono', monospace;
+  overflow-x: hidden;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+#cosmos {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 0 2rem;
+}
+
+.hero-eyebrow {
+  font-size: .58rem;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+  animation: fadeIn 2s ease both;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 300;
+  letter-spacing: -.02em;
+  line-height: .95;
+  margin-bottom: 1.5rem;
+  animation: fadeIn 2s ease .3s both;
+}
+.hero-title em { color: var(--gold3); font-style: italic; }
+
+.hero-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(.95rem, 2.2vw, 1.3rem);
+  color: var(--dim);
+  max-width: 650px;
+  line-height: 1.6;
+  margin-bottom: 3rem;
+  animation: fadeIn 2s ease .6s both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SECTION HEADERS ── */
+.section {
+  margin: 4rem 0;
+  animation: fadeIn 1.5s ease both;
+}
+
+.sec-kicker {
+  font-size: .55rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+
+.sec-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+.sec-title em { color: var(--gold2); font-style: italic; }
+
+.sec-body {
+  color: var(--dim);
+  font-size: .95rem;
+  line-height: 1.7;
+  max-width: 720px;
+}
+
+/* ── SECTORS GRID ── */
+.sectors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  background: var(--dimmer);
+  border: 1px solid var(--dimmer);
+  margin-top: 2rem;
+}
+
+.sector-card {
+  background: var(--void);
+  padding: 1.8rem 1.5rem;
+  cursor: pointer;
+  transition: all .3s;
+  position: relative;
+  border: none;
+  text-align: left;
+}
+
+.sector-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  transition: all .3s;
+}
+
+.sector-card:hover {
+  background: rgba(240,238,232,.04);
+}
+
+.sector-card:hover::before {
+  background: var(--gold);
+  height: 3px;
+}
+
+.sector-card.selected {
+  background: var(--mid);
+}
+
+.sector-card.selected::before {
+  background: var(--gold2);
+  height: 3px;
+}
+
+.sector-number {
+  font-size: .7rem;
+  letter-spacing: .15em;
+  color: var(--gold);
+  margin-bottom: .5rem;
+  display: block;
+}
+
+.sector-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--snow);
+  margin-bottom: .5rem;
+}
+
+.sector-emoji {
+  font-size: 1.8rem;
+  margin-bottom: .8rem;
+  display: block;
+}
+
+.sector-tag {
+  font-size: .75rem;
+  color: var(--dim);
+  line-height: 1.4;
+}
+
+/* ── DETAIL SECTION ── */
+.detail-section {
+  display: none;
+  margin-top: 3rem;
+  animation: slideUp .5s ease both;
+}
+
+.detail-section.active {
+  display: block;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.detail-header {
+  background: linear-gradient(135deg, var(--deep) 0%, var(--mid) 100%);
+  border: 1px solid var(--dimmer);
+  padding: 2.5rem 2rem;
+  border-radius: 4px;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.detail-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold2) 50%, var(--gold3) 100%);
+}
+
+.detail-sector-emoji {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.detail-sector-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  color: var(--snow);
+}
+
+.detail-sector-tag {
+  color: var(--gold2);
+  font-size: .85rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.detail-sector-description {
+  color: var(--dim);
+  font-size: .95rem;
+  line-height: 1.7;
+  max-width: 800px;
+}
+
+/* ── CATEGORIES ── */
+.categories {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.category {
+  background: var(--deep);
+  border: 1px solid var(--dimmer);
+  padding: 2rem;
+  border-radius: 4px;
+  transition: border-color .3s;
+}
+
+.category:hover {
+  border-color: rgba(240,238,232,.15);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.category-icon {
+  font-size: 2rem;
+}
+
+.category-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--snow);
+  flex: 1;
+  min-width: 150px;
+}
+
+.category-label {
+  font-size: .65rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  padding: .4rem .8rem;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.category.service .category-label {
+  background: rgba(26, 143, 143, 0.2);
+  color: var(--teal2);
+  border: 1px solid var(--teal);
+}
+
+.category.input .category-label {
+  background: rgba(192, 69, 42, 0.2);
+  color: var(--coral2);
+  border: 1px solid var(--coral);
+}
+
+.category.infrastructure .category-label {
+  background: rgba(107, 79, 170, 0.2);
+  color: var(--violet2);
+  border: 1px solid var(--violet);
+}
+
+.category-description {
+  color: var(--dim);
+  font-size: .9rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.examples-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: .8rem;
+}
+
+.examples-list li {
+  font-size: .85rem;
+  color: var(--snow);
+  padding: .7rem 1rem;
+  background: var(--void);
+  border-left: 2px solid var(--dimmer);
+  transition: all .3s;
+}
+
+.examples-list li:hover {
+  border-left-color: var(--gold);
+  background: rgba(240,238,232,.03);
+}
+
+.category.service .examples-list li:hover {
+  border-left-color: var(--teal2);
+}
+
+.category.input .examples-list li:hover {
+  border-left-color: var(--coral2);
+}
+
+.category.infrastructure .examples-list li:hover {
+  border-left-color: var(--violet2);
+}
+
+/* ── BACK BUTTON ── */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .8rem 1.5rem;
+  background: transparent;
+  border: 1px solid var(--dimmer);
+  color: var(--gold);
+  font-family: 'DM Mono', monospace;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: all .3s;
+  margin-bottom: 2rem;
+  text-decoration: none;
+}
+
+.back-btn:hover {
+  border-color: var(--gold);
+  background: rgba(201, 148, 58, 0.1);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .wrap { padding: 0 1.5rem 3rem; }
+  .sectors-grid { grid-template-columns: 1fr; }
+  .examples-list { grid-template-columns: 1fr; }
+  .category-header { flex-direction: column; align-items: flex-start; }
+}
+
+/* ── STARFIELD CANVAS ── */
+canvas {
+  display: block;
+}
+</style>
+</head>
+<body>
+
+<canvas id="cosmos"></canvas>
+
+<div class="wrap">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">GÉNESIS XP · Módulo de Exploración</div>
+    <h1 class="hero-title">Los 10 Sectores del <em>GDP Global</em></h1>
+    <p class="hero-subtitle">
+      Cada sector es un universo de problemas no resolvidos. <em>Elige el tuyo</em> y comienza la decodificación del ecosistema económico real.
+    </p>
+  </section>
+
+  <!-- INTRO SECTION -->
+  <section class="section">
+    <div class="sec-kicker">01 · El mapa del universo económico</div>
+    <h2 class="sec-title">$100 trillones en actividad global.<br><em>Cada sector, una dimensión de posibilidades.</em></h2>
+    <p class="sec-body">
+      La economía mundial no es un sistema abstracto — es la suma de millones de personas resolviendo necesidades de millones de personas. Cada setor tiene tres dimensiones: <strong>servicios</strong> (las personas que ayudan), <strong>insumos</strong> (lo que se consume), e <strong>infraestructura</strong> (lo que perdura). Selecciona un sector para explorar su anatomía completa.
+    </p>
+  </section>
+
+  <!-- SECTORS GRID -->
+  <div class="sectors-grid" id="sectorsGrid"></div>
+
+  <!-- DETAIL SECTION -->
+  <section class="detail-section" id="detailSection">
+    <button class="back-btn" onclick="hideDetail()">← Volver a todos los sectores</button>
+    
+    <div class="detail-header">
+      <div class="detail-sector-emoji" id="detailEmoji"></div>
+      <h2 class="detail-sector-title" id="detailTitle"></h2>
+      <div class="detail-sector-tag" id="detailTag"></div>
+      <p class="detail-sector-description" id="detailDescription"></p>
+    </div>
+
+    <div class="categories" id="categoriesContainer"></div>
+  </section>
+
+</div>
+
+<script>
+// ── STARFIELD ANIMATION ──
+const canvas = document.getElementById('cosmos');
+const ctx = canvas.getContext('2d');
+let w, h, stars = [];
+
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+
+function Star() {
+  this.x = Math.random() * w;
+  this.y = Math.random() * h;
+  this.z = Math.random() * 1000;
+}
+
+Star.prototype.update = function() {
+  this.z -= 0.5;
+  if (this.z <= 0) {
+    this.z = 1000;
+    this.x = Math.random() * w;
+    this.y = Math.random() * h;
+  }
+};
+
+Star.prototype.draw = function() {
+  const x = (this.x - w / 2) * (1000 / this.z) + w / 2;
+  const y = (this.y - h / 2) * (1000 / this.z) + h / 2;
+  const s = (1000 - this.z) / 1000;
+  const size = s * 2;
+  const opacity = s * 0.4;
+  ctx.fillStyle = `rgba(240, 238, 232, ${opacity})`;
+  ctx.beginPath();
+  ctx.arc(x, y, size, 0, Math.PI * 2);
+  ctx.fill();
+};
+
+function init() {
+  resize();
+  for (let i = 0; i < 300; i++) {
+    stars.push(new Star());
+  }
+}
+
+function animate() {
+  ctx.fillStyle = 'rgba(4, 4, 10, 0.1)';
+  ctx.fillRect(0, 0, w, h);
+  stars.forEach(star => {
+    star.update();
+    star.draw();
+  });
+  requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', resize);
+init();
+animate();
+
+// ── SECTORS DATA ──
+const sectors = [
+  {
+    id: 1,
+    emoji: '🌾',
+    name: 'Alimentos, Bebidas & Laboratorios de Nutrientes',
+    tag: 'Seguridad alimentar · Agroindústria · Nutrición',
+    description: 'Da producción agrícola a la consultoría nutricional, este sector resuelve la necesidad más básica del ser humano. El desperdicio alimentar, el acceso nutricional y la soberania alimentaria son sus problemas abiertos.',
+    services: {
+      description: 'Las personas y servicios que producen, distribuyen y asesoran sobre alimentos',
+      examples: [
+        'Restaurantes y cadenas de comida rápida',
+        'Servicios de catering corporativo e institucional',
+        'Consultoría nutricional y dietética',
+        'Servicios de delivery y distribución de alimentos',
+        'Investigación y desarrollo de nuevos productos alimenticios',
+        'Certificación de calidad alimentaria y seguridad (ISO, HACCP)',
+        'Servicios de control de calidad y análisis de laboratorio'
+      ]
+    },
+    inputs: {
+      description: 'Los productos alimenticios y materias primas que se consumen',
+      examples: [
+        'Productos alimenticios frescos (frutas, verduras, carnes, lácteos)',
+        'Alimentos procesados y envasados',
+        'Bebidas (alcohólicas y no alcohólicas)',
+        'Suplementos nutricionales y vitaminas',
+        'Ingredientes y materias primas para la industria alimentaria',
+        'Empaques y envases desechables',
+        'Productos químicos para conservación y procesamiento'
+      ]
+    },
+    infrastructure: {
+      description: 'La maquinaria, equipos y plantas que permiten el procesamiento industrial',
+      examples: [
+        'Maquinaria industrial para procesamiento (molinos, mezcladoras, pasteurizadoras)',
+        'Equipos de refrigeración y congelación industrial',
+        'Líneas de producción automatizadas',
+        'Equipos de laboratorio para análisis nutricional',
+        'Tanques de almacenamiento y silos',
+        'Vehículos refrigerados para transporte',
+        'Infraestructura de plantas procesadoras y empacadoras'
+      ]
+    }
+  },
+  {
+    id: 2,
+    emoji: '🩺',
+    name: 'Sistema de Salud & Laboratorios Farmacéuticos',
+    tag: 'Medicina · Diagnóstico · Bem-estar · Saúde mental',
+    description: 'Atención hospitalaria, telemedicina, medicamentos y investigación clínica forman el sector de $4.5T anuales donde la brecha entre lo que la ciencia puede hacer y lo que las personas acceden aún no se ha cerrado.',
+    services: {
+      description: 'Los profesionales y servicios que cuidan la salud humana',
+      examples: [
+        'Atención médica hospitalaria y ambulatoria',
+        'Servicios de diagnóstico y análisis clínicos',
+        'Telemedicina y consultas remotas',
+        'Servicios de emergencias y urgencias',
+        'Rehabilitación y fisioterapia',
+        'Investigación clínica y ensayos farmacéuticos',
+        'Gestión hospitalaria y administración sanitaria',
+        'Servicios de salud mental y psiquiatría',
+        'Cuidados paliativos y domiciliarios'
+      ]
+    },
+    inputs: {
+      description: 'Los medicamentos y materiales médicos consumibles',
+      examples: [
+        'Medicamentos de prescripción y venta libre',
+        'Vacunas y productos biológicos',
+        'Material médico desechable (jeringas, guantes, mascarillas)',
+        'Reactivos de laboratorio y kits de diagnóstico',
+        'Productos farmacéuticos para tratamientos específicos',
+        'Soluciones intravenosas y sueros',
+        'Productos de higiene hospitalaria y desinfectantes'
+      ]
+    },
+    infrastructure: {
+      description: 'Los equipos médicos y hospitales que sostienen el sistema de salud',
+      examples: [
+        'Equipos de diagnóstico por imagen (resonancia magnética, tomógrafos, rayos X)',
+        'Equipos quirúrgicos y de cirugía mínimamente invasiva',
+        'Camas hospitalarias y mobiliario médico',
+        'Sistemas de información hospitalaria (HIS)',
+        'Equipos de laboratorio (analizadores, centrífugas, microscopios)',
+        'Ambulancias y vehículos especializados',
+        'Infraestructura hospitalaria y centros de salud'
+      ]
+    }
+  },
+  {
+    id: 3,
+    emoji: '🏙️',
+    name: 'Vivienda & Servicios Públicos',
+    tag: 'Água · Energia · Saneamento · Infraestructura urbana',
+    description: 'Agua potable, energía confiable y saneamiento continúan siendo deudas globales. La transición energética y la crisis hídrica hacen de este sector uno de los más urgentes y transformables del siglo.',
+    services: {
+      description: 'Los servicios esenciales que hacen habitable una ciudad',
+      examples: [
+        'Servicios de suministro de agua potable y saneamiento',
+        'Distribución de electricidad y gas natural',
+        'Gestión de residuos sólidos y reciclaje',
+        'Mantenimiento de edificios y condominio',
+        'Servicios de limpieza y jardinería',
+        'Administración de propiedades y bienes raíces',
+        'Servicios de alcantarillado y tratamiento de aguas residuales',
+        'Seguridad y vigilancia residencial'
+      ]
+    },
+    inputs: {
+      description: 'Los recursos y materiales que se consumen en el hogar',
+      examples: [
+        'Consumo de agua corriente, electricidad y gas',
+        'Productos de limpieza y mantenimiento del hogar',
+        'Materiales de construcción no durables (cemento, arena, pintura)',
+        'Productos para el tratamiento de agua',
+        'Combustibles para calefacción',
+        'Material eléctrico básico (bombillas, cables)',
+        'Productos de jardinería (fertilizantes, pesticidas)'
+      ]
+    },
+    infrastructure: {
+      description: 'Las redes y edificaciones que proveen servicios urbanos',
+      examples: [
+        'Infraestructura de redes eléctricas y subestaciones',
+        'Plantas de tratamiento de agua y desalinización',
+        'Sistemas de alcantarillado y drenaje urbano',
+        'Edificios residenciales y viviendas',
+        'Electrodomésticos (refrigeradores, lavadoras, calentadores)',
+        'Sistemas de calefacción y aire acondicionado',
+        'Paneles solares y sistemas de energía renovable',
+        'Medidores inteligentes y sistemas de gestión energética'
+      ]
+    }
+  },
+  {
+    id: 4,
+    emoji: '📚',
+    name: 'Educación & Profesiones',
+    tag: 'Formação · Certificação · E-learning · Pesquisa',
+    description: 'Define quién tiene acceso al conocimiento que transforma vidas. La brecha entre lo que se enseña y lo que el mundo real necesita es el problema central — y la mayor oportunidad para rediseñar el talento humano.',
+    services: {
+      description: 'Las instituciones y profesionales que educan y capacitan',
+      examples: [
+        'Educación primaria, secundaria y superior (universidades)',
+        'Formación profesional y técnica',
+        'Capacitación corporativa y desarrollo organizacional',
+        'Educación en línea y plataformas e-learning',
+        'Servicios de tutoría y preparación para exámenes',
+        'Investigación académica y publicaciones científicas',
+        'Certificación profesional y acreditación',
+        'Servicios de orientación vocacional y coaching profesional'
+      ]
+    },
+    inputs: {
+      description: 'Los materiales educativos y recursos de aprendizaje',
+      examples: [
+        'Libros de texto y material didáctico',
+        'Papelería y útiles escolares',
+        'Licencias de software educativo',
+        'Material de laboratorio para práctica educativa',
+        'Suscripciones a bases de datos académicas',
+        'Productos químicos para laboratorios escolares',
+        'Material impreso (exámenes, guías, manuales)'
+      ]
+    },
+    infrastructure: {
+      description: 'Los edificios educativos y tecnología para el aprendizaje',
+      examples: [
+        'Infraestructura educativa (escuelas, universidades, centros de formación)',
+        'Equipos de laboratorio científico',
+        'Computadoras y tablets para educación',
+        'Sistemas de gestión del aprendizaje (LMS)',
+        'Bibliotecas y centros de recursos',
+        'Mobiliario escolar (pupitres, pizarras interactivas)',
+        'Equipos audiovisuales para aulas',
+        'Instalaciones deportivas educativas'
+      ]
+    }
+  },
+  {
+    id: 5,
+    emoji: '✈️',
+    name: 'Transporte & Logística',
+    tag: 'Mobilidade · Carga · Conectividad · Infraestructura viária',
+    description: 'El sistema circulatorio de la economía global. La electrificación del transporte, la logística de última milla y la descarbonización de la aviación son los grandes problemas no resueltos de esta generación.',
+    services: {
+      description: 'Los servicios que mueven personas y mercancías',
+      examples: [
+        'Transporte de pasajeros urbano e interurbano',
+        'Servicios de carga y logística',
+        'Operación de aerolíneas comerciales',
+        'Servicios de transporte marítimo y puertos',
+        'Mantenimiento y reparación de vehículos',
+        'Servicios de mensajería y paquetería',
+        'Gestión de flotas y logística empresarial',
+        'Control de tráfico aéreo y marítimo'
+      ]
+    },
+    inputs: {
+      description: 'Los combustibles y materiales consumibles del transporte',
+      examples: [
+        'Combustibles (gasolina, diésel, queroseno de aviación)',
+        'Lubricantes y aceites para vehículos',
+        'Neumáticos y repuestos de desgaste',
+        'Materiales de mantenimiento vehicular',
+        'Peajes y tarifas de uso de infraestructura',
+        'Productos químicos para mantenimiento de aeronaves',
+        'Material de embalaje y envío'
+      ]
+    },
+    infrastructure: {
+      description: 'Los vehículos y redes de transporte',
+      examples: [
+        'Vehículos automotores (automóviles, camiones, autobuses)',
+        'Aeronaves comerciales y de carga',
+        'Trenes y material ferroviario',
+        'Buques y embarcaciones marítimas',
+        'Infraestructura vial (carreteras, puentes, túneles)',
+        'Aeropuertos y terminales aéreas',
+        'Puertos marítimos y terminales de carga',
+        'Vías férreas y estaciones de tren',
+        'Sistemas de señalización y control de tráfico'
+      ]
+    }
+  },
+  {
+    id: 6,
+    emoji: '⚡',
+    name: 'Energía, Petróleo & Gas',
+    tag: 'Extração · Renováveis · Distribuição · Trading energético',
+    description: 'El sustrato de toda actividad económica. La transición del petróleo a energías limpias es la mayor reconfiguración económica de las próximas décadas — con miles de nodos de innovación aún sin dueño.',
+    services: {
+      description: 'Los servicios de exploración, refinación y distribución energética',
+      examples: [
+        'Exploración y extracción de petróleo y gas',
+        'Refinación y procesamiento de hidrocarburos',
+        'Distribución de combustibles',
+        'Generación y distribución de energía eléctrica',
+        'Comercialización de energía en mercados mayoristas',
+        'Mantenimiento de infraestructura energética',
+        'Consultoría en eficiencia energética',
+        'Trading de commodities energéticos'
+      ]
+    },
+    inputs: {
+      description: 'Los combustibles y energía que alimentan la economía',
+      examples: [
+        'Gasolina, diésel y combustibles refinados',
+        'Gas natural y gas licuado de petróleo (GLP)',
+        'Petróleo crudo',
+        'Carbón para generación eléctrica',
+        'Energía eléctrica consumida',
+        'Productos petroquímicos básicos',
+        'Lubricantes y grasas industriales'
+      ]
+    },
+    infrastructure: {
+      description: 'Las plantas y redes que generan y distribuyen energía',
+      examples: [
+        'Plataformas de extracción petrolera (offshore y onshore)',
+        'Refinerías de petróleo',
+        'Plantas de generación eléctrica (térmica, nuclear, hidroeléctrica)',
+        'Parques eólicos y solares',
+        'Redes de transmisión y distribución eléctrica',
+        'Oleoductos y gasoductos',
+        'Tanques de almacenamiento de combustibles',
+        'Estaciones de servicio y distribución de combustibles'
+      ]
+    }
+  },
+  {
+    id: 7,
+    emoji: '📡',
+    name: 'Comunicaciones & Internet',
+    tag: 'Telecomunicações · Cloud · Software · Cibersegurança',
+    description: 'La infraestructura digital que habilita todos los demás sectores. La brecha de conectividad, la soberanía digital y la privacidad de datos afectan hoy a miles de millones de personas sin solución completa.',
+    services: {
+      description: 'Los servicios que conectan y procesan información digital',
+      examples: [
+        'Servicios de telefonía móvil y fija',
+        'Provisión de internet de banda ancha',
+        'Servicios de streaming y contenido digital',
+        'Cloud computing y servicios en la nube',
+        'Desarrollo y mantenimiento de software',
+        'Ciberseguridad y protección de datos',
+        'Hosting y data centers',
+        'Servicios de call center y atención al cliente'
+      ]
+    },
+    inputs: {
+      description: 'Los planes, datos y contenidos digitales que se consumen',
+      examples: [
+        'Planes de datos y servicios de internet',
+        'Suscripciones a plataformas digitales',
+        'Licencias de software y aplicaciones',
+        'Servicios de publicidad digital',
+        'Consumo de contenido digital (música, video)',
+        'Servicios de mensajería y comunicación',
+        'Ancho de banda y tráfico de datos'
+      ]
+    },
+    infrastructure: {
+      description: 'Las redes y equipos que sostienen las comunicaciones globales',
+      examples: [
+        'Torres de telecomunicaciones y antenas',
+        'Fibra óptica y cables submarinos',
+        'Satélites de comunicaciones',
+        'Servidores y equipos de data centers',
+        'Dispositivos móviles (smartphones, tablets)',
+        'Routers y equipos de red',
+        'Infraestructura de centros de datos',
+        'Equipos de transmisión y conmutación'
+      ]
+    }
+  },
+  {
+    id: 8,
+    emoji: '🏦',
+    name: 'Financiero, Seguros, Pensiones & Cuidados',
+    tag: 'Banca · Fintech · Pensões · Cuidado infantil e geriátrico',
+    description: 'Distribuye recursos, gestiona riesgos y protege el futuro. Inclusión financiera, acceso al crédito y cuidado digno en la vejez son los problemas humanos más urgentes que este sector aún no ha resuelto para todos.',
+    services: {
+      description: 'Los servicios que gestionan el dinero y protegen a las personas',
+      examples: [
+        'Servicios bancarios (cuentas, préstamos, créditos)',
+        'Asesoría financiera y gestión de inversiones',
+        'Seguros de vida, salud, auto y propiedad',
+        'Administración de fondos de pensiones',
+        'Servicios de cuidado infantil (guarderías, educación inicial)',
+        'Servicios de cuidado de adultos mayores (residencias, atención domiciliaria)',
+        'Servicios de pago y remesas',
+        'Gestión de riesgos y compliance'
+      ]
+    },
+    inputs: {
+      description: 'Las comisiones, primas y productos financieros de corto plazo',
+      examples: [
+        'Comisiones y tarifas bancarias',
+        'Primas de seguros',
+        'Productos financieros de corto plazo',
+        'Servicios de asesoría puntual',
+        'Material de oficina para instituciones financieras',
+        'Productos de higiene para centros de cuidado',
+        'Alimentos para servicios de cuidado infantil y geriátrico'
+      ]
+    },
+    infrastructure: {
+      description: 'Los edificios, sistemas y tecnología del sector financiero',
+      examples: [
+        'Infraestructura bancaria (sucursales, cajeros automáticos)',
+        'Sistemas de gestión bancaria y financiera',
+        'Edificios de compañías de seguros',
+        'Centros de cuidado infantil y geriátricos',
+        'Equipos médicos para centros de cuidado',
+        'Mobiliario especializado para cuidados',
+        'Sistemas de seguridad financiera',
+        'Plataformas tecnológicas de fintech'
+      ]
+    }
+  },
+  {
+    id: 9,
+    emoji: '🎭',
+    name: 'Entretenimiento, Turismo & Deportes',
+    tag: 'Lazer · Hospitalidade · Cultura · Produção audiovisual',
+    description: 'Nutre el alma humana y construye identidad cultural. Turismo sostenible, modelos de negocio culturales viables y acceso democrático a la experiencia artística son sus desafíos más vivos.',
+    services: {
+      description: 'Los servicios que generan experiencias memorables',
+      examples: [
+        'Servicios hoteleros y alojamiento',
+        'Operación de parques temáticos y atracciones',
+        'Organización de eventos deportivos y culturales',
+        'Agencias de viajes y tour operadores',
+        'Servicios de guías turísticos',
+        'Producción de contenido audiovisual (cine, TV)',
+        'Servicios de streaming de entretenimiento',
+        'Gestión deportiva y representación de atletas'
+      ]
+    },
+    inputs: {
+      description: 'Los boletos, productos y contenidos consumibles',
+      examples: [
+        'Boletos y entradas para eventos',
+        'Alimentos y bebidas en establecimientos turísticos',
+        'Souvenirs y merchandising',
+        'Paquetes turísticos',
+        'Material promocional',
+        'Productos de consumo en eventos',
+        'Contenido digital de entretenimiento'
+      ]
+    },
+    infrastructure: {
+      description: 'Los estadios, hoteles e instalaciones de entretenimiento',
+      examples: [
+        'Hoteles y resorts',
+        'Estadios y arenas deportivas',
+        'Parques temáticos y atracciones',
+        'Museos y centros culturales',
+        'Salas de cine y teatros',
+        'Equipamiento deportivo profesional',
+        'Cruceros y embarcaciones turísticas',
+        'Teleféricos y funiculares turísticos',
+        'Estudios de producción audiovisual'
+      ]
+    }
+  },
+  {
+    id: 10,
+    emoji: '⚖️',
+    name: 'Seguridad, Defensa & Sistema Judicial',
+    tag: 'Ordem pública · Sistema judicial · Defesa · Cibersegurança',
+    description: 'La base sobre la cual todos los otros sectores son construidos. Acceso igualitario a la justicia, rehabilitación prisional y defensa contra amenazas digitales son los problemas estructurales del siglo XXI.',
+    services: {
+      description: 'Los servicios que protegen y hacen cumplir la ley',
+      examples: [
+        'Servicios policiales y seguridad pública',
+        'Administración de justicia y tribunales',
+        'Servicios penitenciarios y rehabilitación',
+        'Seguridad privada y vigilancia',
+        'Inteligencia y contrainteligencia',
+        'Servicios legales y asesoría jurídica',
+        'Servicios notariales y de registro',
+        'Ciberseguridad nacional y defensa digital'
+      ]
+    },
+    inputs: {
+      description: 'Los materiales consumibles del sistema de justicia y seguridad',
+      examples: [
+        'Municiones y armamento consumible',
+        'Uniformes y equipamiento policial',
+        'Material de oficina judicial',
+        'Combustibles para vehículos de seguridad',
+        'Productos químicos forenses',
+        'Alimentos para centros penitenciarios',
+        'Material de capacitación y entrenamiento'
+      ]
+    },
+    infrastructure: {
+      description: 'Los edificios, vehículos y sistemas de seguridad',
+      examples: [
+        'Infraestructura penitenciaria (cárceles, centros de detención)',
+        'Edificios judiciales y tribunales',
+        'Sistemas de vigilancia y seguridad (CCTV, alarmas)',
+        'Vehículos policiales y militares',
+        'Equipamiento militar (tanques, aeronaves, buques)',
+        'Sistemas de armas y defensa',
+        'Infraestructura de inteligencia',
+        'Centros de comando y control'
+      ]
+    }
+  }
+];
+
+// ── GENERATE SECTOR CARDS ──
+const sectorsGrid = document.getElementById('sectorsGrid');
+const detailSection = document.getElementById('detailSection');
+
+sectors.forEach(sector => {
+  const card = document.createElement('div');
+  card.className = 'sector-card';
+  card.innerHTML = `
+    <span class="sector-emoji">${sector.emoji}</span>
+    <span class="sector-number">SETOR ${String(sector.id).padStart(2, '0')}</span>
+    <h3 class="sector-name">${sector.name}</h3>
+    <p class="sector-tag">${sector.tag}</p>
+  `;
+  card.addEventListener('click', () => showSectorDetail(sector, card));
+  sectorsGrid.appendChild(card);
+});
+
+// ── SHOW SECTOR DETAIL ──
+function showSectorDetail(sector, cardElement) {
+  // Update selection visual
+  document.querySelectorAll('.sector-card').forEach(c => c.classList.remove('selected'));
+  cardElement.classList.add('selected');
+
+  // Update detail header
+  document.getElementById('detailEmoji').textContent = sector.emoji;
+  document.getElementById('detailTitle').textContent = sector.name;
+  document.getElementById('detailTag').textContent = sector.tag;
+  document.getElementById('detailDescription').textContent = sector.description;
+
+  // Generate categories
+  const categoriesContainer = document.getElementById('categoriesContainer');
+  categoriesContainer.innerHTML = `
+    <div class="category service">
+      <div class="category-header">
+        <span class="category-icon">🤝</span>
+        <h3 class="category-title">Servicios</h3>
+        <span class="category-label">Intangibles</span>
+      </div>
+      <p class="category-description">${sector.services.description}</p>
+      <ul class="examples-list">
+        ${sector.services.examples.map(ex => `<li>${ex}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="category input">
+      <div class="category-header">
+        <span class="category-icon">🧃</span>
+        <h3 class="category-title">Bienes No Durables / Insumos</h3>
+        <span class="category-label">Consumibles</span>
+      </div>
+      <p class="category-description">${sector.inputs.description}</p>
+      <ul class="examples-list">
+        ${sector.inputs.examples.map(ex => `<li>${ex}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="category infrastructure">
+      <div class="category-header">
+        <span class="category-icon">🏗️</span>
+        <h3 class="category-title">Bienes Durables / Infraestructura</h3>
+        <span class="category-label">Permanente</span>
+      </div>
+      <p class="category-description">${sector.infrastructure.description}</p>
+      <ul class="examples-list">
+        ${sector.infrastructure.examples.map(ex => `<li>${ex}</li>`).join('')}
+      </ul>
+    </div>
+  `;
+
+  // Show detail section with smooth scroll
+  detailSection.classList.add('active');
+  detailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── HIDE DETAIL ──
+function hideDetail() {
+  detailSection.classList.remove('active');
+  document.querySelectorAll('.sector-card').forEach(c => c.classList.remove('selected'));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
